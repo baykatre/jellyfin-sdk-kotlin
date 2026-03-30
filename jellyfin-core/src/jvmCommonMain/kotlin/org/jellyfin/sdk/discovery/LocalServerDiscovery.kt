@@ -71,7 +71,12 @@ public actual class LocalServerDiscovery actual constructor(jellyfinOptions: Jel
 			// Read as JSON
 			val info = json.decodeFromString(ServerDiscoveryInfo.serializer(), message)
 
-			info
+			// Fill endpointAddress from packet source IP if not set by server
+			if (info.endpointAddress.isNullOrBlank()) {
+				info.copy(endpointAddress = packet.address.hostAddress)
+			} else {
+				info
+			}
 		} catch (err: SocketTimeoutException) {
 			// Unable to receive due too timeout, which is common for non-Jellyfin devices
 			// Just ignore
